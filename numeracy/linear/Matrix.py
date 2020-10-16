@@ -78,6 +78,48 @@ class Matrix:
         from numeracy.linear.Vector import Vector
         return Vector(self.data[:, c])
 
+    def getDiag(self):
+        require(self.isSquare())
+        n = self.row
+        d = []
+        for i in range(n):
+            d.append(self[i][i])
+        return diagonal(d)
+
+    def isDiag(self):
+        require(self.isSquare())
+        n = self.row
+        for i in range(n):
+            for j in range(n):
+                if((i != j) and (self[i][j] != 0)):
+                    return False
+
+        return True
+
+    def getUpper(self):
+        require(self.isSquare())
+        A = self
+        n = A.row
+        for i in range(n):
+            for j in range(i):
+                A[i][j] = 0
+
+        return A
+
+    def getLower(self):
+        require(self.isSquare())
+        A = self
+        n = A.row
+        for i in range(n):
+            for j in range(i + 1, n):
+                A[i][j] = 0
+
+        return A
+
+    def inverse(self):
+            pass
+
+
     def rowVectors(self):
         return list(self.data)
 
@@ -180,3 +222,10 @@ def fromArray(data: ndarray):
         from numeracy.linear.Vector import Vector
         return Vector(data)
     return Matrix(data)
+
+def diagonal(d: ndarray):
+    n = len(d)
+    A = zero(n, n, float)
+    for i in range(n):
+        A[i][i] = d[i]
+    return A
