@@ -3,7 +3,8 @@
 """
 包含线性方程的直接解法，包括
  1. （选主元）Gauss 消去法
- 2. 
+ 2. 利用 Cholesky 分解求解
+ 3. 正则化方法
 
 """
 from numeracy.Util import require
@@ -12,6 +13,10 @@ from numeracy.linear import Vector, Matrix
 from numeracy.linear.Matrix import Matrix as TMatrix
 from numeracy.linear.Vector import Vector as TVector
 import numpy as np
+
+def gaussElimination(A : TMatrix, b : TVector, pivot) -> TVector:
+    # TODO
+    pass
 
 
 def solveUpper(U: TMatrix, b: TVector) -> TVector:

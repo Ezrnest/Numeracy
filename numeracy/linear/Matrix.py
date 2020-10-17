@@ -5,7 +5,6 @@
 
 """
 import typing
-from numpy.matrixlib import matrix
 import numpy as np
 from numpy import ndarray
 from numeracy.Util import require
@@ -22,6 +21,10 @@ class Matrix:
             raise Exception("Dim of the array != 2")
         self.data = data
         (self.row, self.column) = data.shape
+
+    @property
+    def shape(self):
+        return self.row,self.column
 
     def __add__(self, other):
         if isinstance(other, Matrix):
@@ -47,6 +50,12 @@ class Matrix:
 
         return NotImplemented
 
+    def __truediv__(self, other):
+        if np.isscalar(other):
+            return fromArray(self.data / other)
+
+        return NotImplemented
+
     def __rmul__(self, other):
         if np.isscalar(other):
             return fromArray(self.data * other)
@@ -58,7 +67,18 @@ class Matrix:
         return np.equal(self.data, other.data)
 
     def __getitem__(self, idx):
-        return self.data[idx]
+        # return self.data[idx]
+        r = self.data[idx]
+        if np.isscalar(r):
+            return r
+        if r.ndim == 2:
+            return fromArray(r)
+        from numeracy.linear import Vector
+        isColumn = not isinstance(idx,int) and isinstance(idx[0], slice)
+        return Vector.of(r, isColumn)
+
+    # def subMatrix(self, r0, r1, c0, c1):
+    #     return fromArray(self.data[r0:r1, c0:c1])
 
     def __setitem__(self, key, value):
         self.data[key] = value
@@ -91,7 +111,7 @@ class Matrix:
         n = self.row
         for i in range(n):
             for j in range(n):
-                if((i != j) and (self[i][j] != 0)):
+                if ((i != j) and (self[i][j] != 0)):
                     return False
 
         return True
@@ -117,8 +137,7 @@ class Matrix:
         return A
 
     def inverse(self):
-            pass
-
+        pass
 
     def rowVectors(self):
         return list(self.data)
@@ -221,6 +240,11 @@ def fromArray(data: ndarray):
     if row == 1 or column == 1:
         from numeracy.linear.Vector import Vector
         return Vector(data)
+    return Matrix(data)
+
+def fromColVectors(vs):
+    arrs = [v.data for v in vs]
+    data = np.concatenate(arrs,axis=1)
     return Matrix(data)
 
 def diagonal(d: ndarray):

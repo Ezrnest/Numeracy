@@ -41,12 +41,12 @@ class Vector(Matrix):
     def __getitem__(self, item):
         if isinstance(item, int):
             if self.isColumn:
-                return self.data[item,0]
+                return self.data[item, 0]
             else:
-                return self.data[0,item]
+                return self.data[0, item]
         return super().__getitem__(item)
 
-    def norm(self, p: Optional[int] = 2):
+    def norm(self, p: Optional[float] = 2.0):
         """
         计算向量的 p-范数，如果 `p is None`，则计算无穷范数。
 
@@ -57,6 +57,16 @@ class Vector(Matrix):
             return np.max(a)
         else:
             return np.sum(a ** p) ** (1.0 / p)
+
+    def innerProduct(self, other):
+        return np.sum(self.data * other.data)
+
+    def unitize(self):
+        """
+        返回归一化后的向量 v / |v|
+
+        """
+        return Vector(self.data / self.norm())
 
 
 def of(arr, isColumn=True, dtype=None) -> Vector:
@@ -74,3 +84,7 @@ def constant(c, length, isColumn=True) -> Vector:
     data = np.array([c] * length)
 
     return of(data, isColumn)
+
+
+def zero(length, dtype=float, isColumn=True) -> Vector:
+    return of(np.zeros(length, dtype), isColumn)
