@@ -251,5 +251,5 @@ def diagonal(d: ndarray):
     n = len(d)
     A = zero(n, n, float)
     for i in range(n):
-        A[i][i] = d[i]
+        A[i,i] = d[i]
     return A

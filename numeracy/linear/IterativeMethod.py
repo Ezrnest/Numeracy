@@ -114,7 +114,7 @@ def gmres(A: TMatrix, b: TVector, m=5, eps=1E-5, maxIter=20) -> Tuple[TVector, b
     :param maxIter: 最大迭代次数
     :return: 元组，包含（最后得到的x,是否收敛，每次的误差（列表））
     """
-    require(eps > 0)
+    require(eps >= 0)
     epss = []
     x = Vector.zero(A.column)
     i = 0
