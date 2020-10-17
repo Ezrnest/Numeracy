@@ -98,7 +98,22 @@ def conjGrad(A: TMatrix, b: TVector, margin=0.01) -> TVector:
     :param b: 右端向量
     :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.01
     """
-    pass
+    x = b
+    r = b - A * x
+    p = r
+    a = r.innerProduct(p) / (A * p).innerProduct(p)
+    count = 0
+    z = a * p
+    while count < 10000 and z.norm >= margin:
+        a = r.innerProduct(p) / (A * p).innerProduct(p)
+        z = a * p
+        x += z
+        r = b - A * x
+        b = -r.innerProduct(A * p) / p.innerProduct(A * p)
+        p = r + b * p
+        count += 1
+
+    return x
 
 
 def orthSimHessExtend(A: TMatrix, m: int, v0: TVector) -> Tuple[TMatrix, List[TVector]]:
