@@ -25,9 +25,9 @@ def solveJacobi(A: TMatrix, b: TVector, margin=0.01) -> TVector:
     """
 
 
-    :param A:
-    :param b:
-    :param margin:
+    :param A: 可逆矩阵
+    :param b: 右端向量
+    :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.01
     """
     require(A.isSquare())
     M = A.getDiag()
@@ -44,6 +44,13 @@ def solveJacobi(A: TMatrix, b: TVector, margin=0.01) -> TVector:
 
 
 def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.01) -> TVector:
+    """
+
+
+    :param A: 可逆矩阵
+    :param b: 右端向量
+    :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.01
+    """
     require(A.isSquare())
     M = A.getLower()
     N = M - A
@@ -57,8 +64,40 @@ def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.01) -> TVector:
         count += 1
     return x
 
+def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.01) -> TVector:
+    """
+
+
+    :param A: 可逆矩阵
+    :param b: 右端向量
+    :param w: 松弛因子，默认=1
+    :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.01
+    """
+    require(A.isSquare())
+    D = A.getDiag()
+    L = A.getLower()
+    U = A.getUpper()
+    M = D - w * L
+    N = (1 - w) * D + w * U
+    M1 = M.inverse()
+    B = M1 * N
+    f = M1 * b
+    x = b
+    count = 0
+    while count < 10000 and (b - A * x).norm() >= margin:
+        x = B * x + f
+        count += 1
+    return x
+
 
 def conjGrad(A: TMatrix, b: TVector, margin=0.01) -> TVector:
+    """
+
+
+    :param A: 对称正定矩阵
+    :param b: 右端向量
+    :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.01
+    """
     pass
 
 

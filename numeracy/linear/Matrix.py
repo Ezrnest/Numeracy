@@ -91,7 +91,7 @@ class Matrix:
         n = self.row
         for i in range(n):
             for j in range(n):
-                if((i != j) and (self[i][j] != 0)):
+                if (i != j) and (self[i][j] != 0):
                     return False
 
         return True
@@ -117,7 +117,32 @@ class Matrix:
         return A
 
     def inverse(self):
-            pass
+        require(self.isSquare())
+        A = self
+        n = A.row
+        I = identity(n)
+        for j in range(n):
+            maxRow = j
+            max = abs(A[j][j])
+            for i in range(j + 1, n):
+                v = abs(A[i][j])
+                if v > max:
+                    maxRow = i
+                    max = v
+            if maxRow != j:
+                A.data[[j, maxRow]] = A.data[[maxRow, j]]
+                I.data[[j, maxRow]] = I.data[[maxRow, j]]
+            c = 1 / A[j][j]
+            A.data[j, j:] *= c
+            I.data[j, j:] *= c
+            for i in range(n) :
+                if i == j:
+                    continue
+                p = -A.data[i][j]
+                A.data[i] += p * A.data[j]
+                I.data[i] += p * A.data[j]
+
+        return I
 
 
     def rowVectors(self):
