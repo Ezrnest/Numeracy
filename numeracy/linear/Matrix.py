@@ -136,7 +136,7 @@ class Matrix:
         n = A.row
         for i in range(n):
             for j in range(i + 1, n):
-                A[i][j] = 0
+                A[i, j] = 0
 
         return A
 
@@ -157,14 +157,14 @@ class Matrix:
                 A.data[[j, maxRow]] = A.data[[maxRow, j]]
                 I.data[[j, maxRow]] = I.data[[maxRow, j]]
             c = 1 / A[j][j]
-            A.data[j, j:] *= c
-            I.data[j, j:] *= c
+            A.data[j] *= c
+            I.data[j] *= c
             for i in range(n) :
                 if i == j:
                     continue
                 p = -A.data[i][j]
                 A.data[i] += p * A.data[j]
-                I.data[i] += p * A.data[j]
+                I.data[i] += p * I.data[j]
 
         return I
 

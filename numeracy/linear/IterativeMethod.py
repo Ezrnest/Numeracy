@@ -55,8 +55,10 @@ def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> T
     """
     require(A.isSquare())
     M = A.getLower()
+    print(M)
     N = M - A
     M1 = M.inverse()
+    print(M1)
     B = M1 * N
     f = M1 * b
     x = Vector.constant(0, A.row)

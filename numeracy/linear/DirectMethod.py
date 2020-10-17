@@ -98,7 +98,7 @@ def solveRegularization(A: TMatrix, b: TVector, alpha = None) -> TVector:
     mu = []
     u = []
     v = []
-    potent, vector = np.linalg.eigh(M)
+    potent, vector = np.linalg.eig(M)
     n = A.row
     for i in range(n):
         mu.append(sqrt(potent[i]))
@@ -106,7 +106,8 @@ def solveRegularization(A: TMatrix, b: TVector, alpha = None) -> TVector:
         v.append(A * u[i] / mu[i])
 
     if alpha is None:
-        alpha = 10 * sqrt(potent.max() * potent.min())
+        alpha = 10 ** (n) *sqrt(potent.max() * potent.min())
+        print('alpha=', alpha)
 
     x = Vector.zero(n)
     for i in range(n):
