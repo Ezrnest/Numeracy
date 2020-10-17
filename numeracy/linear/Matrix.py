@@ -80,11 +80,15 @@ class Matrix:
 
     def getDiag(self):
         require(self.isSquare())
-        n = self.row
-        d = []
+        A = copy(self)
+        n = A.row
         for i in range(n):
-            d.append(self[i][i])
-        return diagonal(d)
+            for j in range(n):
+                if j != i:
+                    A[i][j] = 0
+
+        return A
+
 
     def isDiag(self):
         require(self.isSquare())
@@ -98,7 +102,7 @@ class Matrix:
 
     def getUpper(self):
         require(self.isSquare())
-        A = self
+        A = copy(self)
         n = A.row
         for i in range(n):
             for j in range(i):
@@ -108,7 +112,7 @@ class Matrix:
 
     def getLower(self):
         require(self.isSquare())
-        A = self
+        A = copy(self)
         n = A.row
         for i in range(n):
             for j in range(i + 1, n):
@@ -118,7 +122,7 @@ class Matrix:
 
     def inverse(self):
         require(self.isSquare())
-        A = self
+        A = copy(self)
         n = A.row
         I = identity(n)
         for j in range(n):
@@ -254,3 +258,7 @@ def diagonal(d: ndarray):
     for i in range(n):
         A[i][i] = d[i]
     return A
+
+def copy(A: Matrix) -> Matrix:
+    d = np.copy(A.data)
+    return Matrix(d)
