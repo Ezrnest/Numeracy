@@ -13,6 +13,7 @@ from numeracy.linear import Vector, Matrix
 from numeracy.linear.Matrix import Matrix as TMatrix
 from numeracy.linear.Vector import Vector as TVector
 import numpy as np
+from math import sqrt
 
 
 def solveGauss0(M: np.ndarray):
@@ -82,3 +83,23 @@ def solveCholesky(A: TMatrix, b: TVector) -> TVector:
     y = solveLower(L, b)
     x = solveUpper(L.T, y)
     return x
+
+def solveRegularization(A: TMatrix, b: TVector) -> TVector:
+    require(A.isSquare())
+    M = (A.T * A).data
+    mu = []
+    u = []
+    v = []
+    potent, vector = np.linalg.eigh(M)
+    n = A.row
+    for i in range(n):
+        mu.append(sqrt(potent[i]))
+        u.append(Vector.of(vector[i]))
+        v.append(A * u[i] / mu[i])
+
+    x = Vector.zero(n)
+    for i in range(n):
+        x += b.innerProduct(v[i]) * u[i] / mu[i]
+
+    return x
+
