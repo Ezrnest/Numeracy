@@ -105,7 +105,7 @@ class Matrix:
         for i in range(n):
             for j in range(n):
                 if j != i:
-                    A[i][j] = 0
+                    A[i, j] = 0
 
         return A
 
@@ -126,7 +126,7 @@ class Matrix:
         n = A.row
         for i in range(n):
             for j in range(i):
-                A[i][j] = 0
+                A[i, j] = 0
 
         return A
 
