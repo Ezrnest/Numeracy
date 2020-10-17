@@ -81,9 +81,9 @@ class Matrix:
     def getDiag(self):
         require(self.isSquare())
         n = self.row
-        d = []
+        d = np.zeros(n)
         for i in range(n):
-            d.append(self[i][i])
+            d[i] = self[i][i]
         return diagonal(d)
 
     def isDiag(self):
@@ -91,7 +91,7 @@ class Matrix:
         n = self.row
         for i in range(n):
             for j in range(n):
-                if((i != j) and (self[i][j] != 0)):
+                if (i != j) and (self[i][j] != 0):
                     return False
 
         return True

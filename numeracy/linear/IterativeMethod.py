@@ -22,7 +22,7 @@ def solveJacobi(A: TMatrix, b: TVector, margin = 0.01) -> TVector:
     f = M1 * b
     x = b
     count = 0
-    while(count < 10000 and (b - A * x).norm() >= margin):
+    while count < 10000 and (b - A * x).norm() >= margin:
         x = B * x + f
         count += 1
     return x
@@ -36,7 +36,7 @@ def solveGaussSeidel(A: TMatrix, b: TVector, margin = 0.01) ->TVector:
     f = M1 * b
     x = b
     count = 0
-    while(count < 10000 and norm(b - A * x) >= margin):
+    while count < 10000 and (b - A * x).norm() >= margin:
         x = B * x + f
         count += 1
     return x
