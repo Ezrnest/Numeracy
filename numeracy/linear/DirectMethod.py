@@ -84,7 +84,15 @@ def solveCholesky(A: TMatrix, b: TVector) -> TVector:
     x = solveUpper(L.T, y)
     return x
 
-def solveRegularization(A: TMatrix, b: TVector) -> TVector:
+
+def solveRegularization(A: TMatrix, b: TVector, alpha = None) -> TVector:
+    """
+    Tikhonov正则化方法，利用矩阵的奇异值分解
+
+    :param A: 可逆矩阵
+    :param b: 右端向量
+    :param alpha: 正则化参数
+    """
     require(A.isSquare())
     M = (A.T * A).data
     mu = []
@@ -97,9 +105,12 @@ def solveRegularization(A: TMatrix, b: TVector) -> TVector:
         u.append(Vector.of(vector[i]))
         v.append(A * u[i] / mu[i])
 
+    if alpha is None:
+        alpha = 10 * sqrt(potent.max() * potent.min())
+
     x = Vector.zero(n)
     for i in range(n):
-        x += b.innerProduct(v[i]) * u[i] / mu[i]
+        coef = mu[i] / (alpha + potent[i])
+        x += b.innerProduct(v[i]) * u[i] * coef
 
     return x
-

@@ -21,13 +21,14 @@ import numeracy.linear.Vector as Vector
 import numpy as np
 
 
-def solveJacobi(A: TMatrix, b: TVector, margin=0.001) -> TVector:
+def solveJacobi(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVector:
     """
 
 
     :param A: 可逆矩阵
     :param b: 右端向量
     :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.001
+    :param maxIter: 算法收敛之前允许的最大迭代次数，默认=10000
     """
     require(A.isSquare())
     M = A.getDiag()
@@ -37,19 +38,20 @@ def solveJacobi(A: TMatrix, b: TVector, margin=0.001) -> TVector:
     f = M1 * b
     x = Vector.constant(0, A.row)
     count = 0
-    while count < 10000 and (b - A * x).norm() >= margin:
+    while count < maxIter and (b - A * x).norm() >= margin:
         x = B * x + f
         count += 1
     return x
 
 
-def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001) -> TVector:
+def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVector:
     """
 
 
     :param A: 可逆矩阵
     :param b: 右端向量
     :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.001
+    :param maxIter: 算法收敛之前允许的最大迭代次数，默认=10000
     """
     require(A.isSquare())
     M = A.getLower()
@@ -59,12 +61,12 @@ def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001) -> TVector:
     f = M1 * b
     x = Vector.constant(0, A.row)
     count = 0
-    while count < 10000 and (b - A * x).norm() >= margin:
+    while count < maxIter and (b - A * x).norm() >= margin:
         x = B * x + f
         count += 1
     return x
 
-def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.001) -> TVector:
+def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.001, maxIter = 10000) -> TVector:
     """
 
 
@@ -72,6 +74,7 @@ def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.001) -> TVector:
     :param b: 右端向量
     :param w: 松弛因子，默认=1
     :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.001
+    :param maxIter: 算法收敛之前允许的最大迭代次数，默认=10000
     """
     require(A.isSquare())
     D = A.getDiag()
@@ -84,30 +87,34 @@ def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.001) -> TVector:
     f = M1 * b
     x = Vector.constant(0, A.row)
     count = 0
-    while count < 10000 and (b - A * x).norm() >= margin:
+    while count < maxIter and (b - A * x).norm() >= margin:
         x = B * x + f
         count += 1
     return x
 
 
-def conjGrad(A: TMatrix, b: TVector, margin=0.001) -> TVector:
+def conjGrad(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVector:
     """
 
 
     :param A: 对称正定矩阵
     :param b: 右端向量
     :param margin: 容许的误差，当残差的模长小于该值时停止迭代，默认=0.001
+    :param maxIter: 算法收敛之前允许的最大迭代次数，默认=10000
     """
     require(A.isSquare())
     x = Vector.constant(0, A.row)
+    r = b
     p = b
     count = 0
-    while count < 10000 and (b - A * x).norm() >= margin:
-        r = b - A * x
-        beta = r.innerProduct(A * p) / p.innerProduct(A * p)
-        p = r + beta * p
-        alpha = r.innerProduct(p) / (A * p).innerProduct(p)
+    while count < maxIter and (b - A * x).norm() >= margin:
+        Ap = A * p
+        pAp = Ap.innerProduct(p)
+        alpha = r.innerProduct(p) / pAp
         x += alpha * p
+        r = b - A * x
+        beta = r.innerProduct(Ap) / pAp
+        p = r + beta * p
         count += 1
 
     return x
