@@ -4,7 +4,7 @@
 包含线性方程的迭代解法，包括
  1. Jacobi迭代法
  2. Gauss-Seidel迭代法
- 3. SOR 迭代法
+ 3. 逐次超松弛(SOR)迭代法
  4. 共轭梯度法
  5. 广义最小化残差方法(GMRES)
 
@@ -21,7 +21,7 @@ import numeracy.linear.Vector as Vector
 import numpy as np
 
 
-def solveJacobi(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVector:
+def solveJacobi(A: TMatrix, b: TVector, margin=0.001, maxIter=10000) -> TVector:
     """
 
 
@@ -44,7 +44,7 @@ def solveJacobi(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVecto
     return x
 
 
-def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVector:
+def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001, maxIter=10000) -> TVector:
     """
 
 
@@ -68,7 +68,8 @@ def solveGaussSeidel(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> T
         count += 1
     return x
 
-def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.001, maxIter = 10000) -> TVector:
+
+def solveSor(A: TMatrix, b: TVector, w=1.0, margin=0.001, maxIter=10000) -> TVector:
     """
 
 
@@ -95,7 +96,7 @@ def solveSor(A: TMatrix, b: TVector, w = 1.0, margin=0.001, maxIter = 10000) -> 
     return x
 
 
-def conjGrad(A: TMatrix, b: TVector, margin=0.001, maxIter = 10000) -> TVector:
+def conjGrad(A: TMatrix, b: TVector, margin=0.001, maxIter=10000) -> TVector:
     """
 
 

@@ -91,12 +91,12 @@ class Matrix:
         return np.linalg.det(self.data)
 
     def getRow(self, r):
-        from numeracy.linear.Vector import Vector
-        return Vector(self.data[r, :])
+        import numeracy.linear.Vector as Vector
+        return Vector.of(self.data[r, :], isColumn=False)
 
     def getCol(self, c):
-        from numeracy.linear.Vector import Vector
-        return Vector(self.data[:, c])
+        import numeracy.linear.Vector as Vector
+        return Vector.of(self.data[:, c])
 
     def getDiag(self):
         require(self.isSquare())
