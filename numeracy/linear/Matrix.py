@@ -24,7 +24,7 @@ class Matrix:
 
     @property
     def shape(self):
-        return self.row,self.column
+        return self.row, self.column
 
     def __add__(self, other):
         if isinstance(other, Matrix):
@@ -74,7 +74,7 @@ class Matrix:
         if r.ndim == 2:
             return fromArray(r)
         from numeracy.linear import Vector
-        isColumn = not isinstance(idx,int) and isinstance(idx[0], slice)
+        isColumn = not isinstance(idx, int) and isinstance(idx[0], slice)
         return Vector.of(r, isColumn)
 
     # def subMatrix(self, r0, r1, c0, c1):
@@ -109,13 +109,12 @@ class Matrix:
 
         return A
 
-
     def isDiag(self):
         require(self.isSquare())
         n = self.row
         for i in range(n):
             for j in range(n):
-                if (i != j) and (self[i,j] != 0):
+                if (i != j) and (self[i, j] != 0):
                     return False
 
         return True
@@ -147,19 +146,19 @@ class Matrix:
         I = identity(n)
         for j in range(n):
             maxRow = j
-            max = abs(A[j][j])
+            max = abs(A[j, j])
             for i in range(j + 1, n):
-                v = abs(A[i][j])
+                v = abs(A[i, j])
                 if v > max:
                     maxRow = i
                     max = v
             if maxRow != j:
                 A.data[[j, maxRow]] = A.data[[maxRow, j]]
                 I.data[[j, maxRow]] = I.data[[maxRow, j]]
-            c = 1 / A[j][j]
+            c = 1 / A[j, j]
             A.data[j] *= c
             I.data[j] *= c
-            for i in range(n) :
+            for i in range(n):
                 if i == j:
                     continue
                 p = -A.data[i][j]
@@ -167,7 +166,6 @@ class Matrix:
                 I.data[i] += p * I.data[j]
 
         return I
-
 
     def rowVectors(self):
         return list(self.data)
@@ -181,6 +179,10 @@ class Matrix:
     @property
     def T(self):
         return self.transpose()
+
+    @property
+    def H(self):
+        return Matrix(self.data.conj().T)
 
     def decompCholesky(self):
         """
@@ -212,6 +214,31 @@ class Matrix:
 
     def __str__(self) -> str:
         return str(self.data)
+
+    def sqrt(self):
+        """
+        返回半正定矩阵 A 的“平方根”，即半正定矩阵 B 使得 B^2 = A
+
+        :return:
+        """
+        require(self.isSquare())
+        u, s, vh = np.linalg.svd(self.data, compute_uv=True, hermitian=True)
+        s = s ** 0.5
+        return Matrix((u * s) @ vh)
+
+    def abs(self):
+        """
+        返回矩阵 A 的“绝对值”，即 A^T A 的平方根。要求这个矩阵是方阵。
+
+        :return:
+        """
+        require(self.isSquare())
+        u, s, vh = np.linalg.svd(self.data, compute_uv=True, hermitian=False)
+        v = vh.conj().T
+        return Matrix((v * s) @ vh)
+
+    def norm(self, p=2):
+        return np.linalg.norm(self.data, p)
 
 
 def fromF(row, column, f, dtype=float):
@@ -272,18 +299,22 @@ def fromArray(data: ndarray):
         return Vector(data)
     return Matrix(data)
 
+
 def fromColVectors(vs):
     arrs = [v.data for v in vs]
-    data = np.concatenate(arrs,axis=1)
+    data = np.concatenate(arrs, axis=1)
     return Matrix(data)
+
 
 def diagonal(d: ndarray):
     n = len(d)
     A = zero(n, n, float)
     for i in range(n):
-        A[i,i] = d[i]
+        A[i, i] = d[i]
     return A
+
 
 def copy(A: Matrix) -> Matrix:
     d = np.copy(A.data)
     return Matrix(d)
+
