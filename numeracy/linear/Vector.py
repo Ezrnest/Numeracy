@@ -68,6 +68,11 @@ class Vector(Matrix):
         """
         return Vector(self.data / self.norm())
 
+    def toColumn(self):
+        if self.isColumn:
+            return self
+        return self.transpose()
+
 
 def of(arr, isColumn=True, dtype=None) -> Vector:
     array = np.asarray(arr, dtype)

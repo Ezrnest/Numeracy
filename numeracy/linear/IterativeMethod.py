@@ -131,7 +131,7 @@ def orthSimHessExtend(A: TMatrix, m: int, v0: TVector) -> Tuple[TMatrix, List[TV
 
     :param A: 矩阵
     :param m: Hessenberg 矩阵的阶数
-    :param v0: 初始向量，要求非零
+    :param v0: 初始列向量，要求非零
     :return 矩阵 H1 以及以列表形式给出的 v_0, ..., v_m 向量
     """
     n = A.row

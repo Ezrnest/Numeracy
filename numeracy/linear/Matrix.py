@@ -4,6 +4,7 @@
 包含矩阵类的工具等。
 
 """
+import math
 import typing
 import numpy as np
 from numpy import ndarray
@@ -168,7 +169,7 @@ class Matrix:
         return I
 
     def rowVectors(self):
-        return list(self.data)
+        return [self.getRow(r) for r in range(self.row)]
 
     def columnVectors(self):
         return [self.getCol(c) for c in range(self.column)]
@@ -211,6 +212,29 @@ class Matrix:
                 L[i, j] = a
                 #  l_{ij} = (a_{ij} - sum(0,j-1,l_{il}l_{jl}))/l_{jj}
         return Matrix(L)
+
+    def decompQR(self):
+        """
+        返回此矩阵的 QR 分解。
+
+        :return:
+        """
+        require(self.isSquare())
+        vs = self.columnVectors()
+        n = self.row
+        R = zero(n, n, self.data.dtype)
+        qs = []
+        for i in range(n):
+            v_i = vs[i]
+            R[i, i] = v_i.norm()
+            q_i = v_i / R[i, i]
+            for j in range(i + 1, n):
+                v_j = vs[j]
+                R[i, j] = q_i.innerProduct(v_j)
+                v_j = v_j - R[i, j] * q_i
+                vs[j] = v_j
+            qs.append(q_i)
+        return fromColVectors(qs), R
 
     def __str__(self) -> str:
         return str(self.data)
@@ -301,7 +325,10 @@ def fromArray(data: ndarray):
 
 
 def fromColVectors(vs):
-    arrs = [v.data for v in vs]
+    arrs = []
+    for v in vs:
+        require(v.isColumn)
+        arrs.append(v.data)
     data = np.concatenate(arrs, axis=1)
     return Matrix(data)
 
@@ -314,7 +341,154 @@ def diagonal(d: ndarray):
     return A
 
 
+def triDiagonal(diag, sub, n, dtype=float):
+    """
+    返回阶数为 `n` 的对称三对角矩阵。
+
+    :param diag: 主对角元
+    :param sub: 次对角线元
+    :param n: 阶数
+    :return:
+    """
+
+    A = zero(n, n, dtype)
+    for i in range(n):
+        A[i, i] = diag
+        if i > 0:
+            A[i, i - 1] = A[i - 1, i] = sub
+    return A
+
+
 def copy(A: Matrix) -> Matrix:
     d = np.copy(A.data)
     return Matrix(d)
 
+
+def givensTrans(A: Matrix, k, l):
+    """
+    使用 Givens 变换将实对称矩阵`A` 的元素 `A[k,l]` 变为 0，此函数会改变这个矩阵。
+
+    :param A:
+    :param k:
+    :param l:
+    :return:
+    """
+    a_kk = A[k, k]
+    a_ll = A[l, l]
+    a_kl = A[k, l]
+    t1 = (a_kk - a_ll) / 2
+    t2 = a_kl
+    θ = np.arctan2(t2, t1) / 2
+    c = np.cos(θ)
+    s = np.sin(θ)
+    c2 = c ** 2
+    s2 = s ** 2
+    x = a_kl * np.sin(2 * θ)
+    A[k, k] = a_kk * c2 + a_ll * s2 + x
+    A[l, l] = a_kk * s2 + a_ll * c2 - x
+    A[l, k] = A[k, l] = 0
+
+    for i in range(A.row):
+        if i == k or i == l:
+            continue
+        a_ik = A[i, k]
+        a_il = A[i, l]
+        A[i, k] = A[k, i] = a_ik * c + a_il * s
+        A[i, l] = A[l, i] = -a_ik * s + a_il * c
+
+    pass
+
+
+def eigenValuesJacobi(A: Matrix, eps=1E-3, maxIter=10):
+    """
+    使用 Jacobi 方法求解实对称矩阵 `A` 的所有特征值。
+
+    :param A: 实对称矩阵
+    :param eps: 近似精度
+    :param maxIter: 最大迭代次数
+    :return: (A 的特征值列表, 其它数据)，其他数据=(迭代次数，每次迭代的变换次数列表，)
+    """
+    require(A.isSquare())
+
+    A = copy(A)
+    n = A.row
+
+    def sumOfSquareOfNonDiag(A: Matrix):
+        s = 0
+        for i in range(A.row):
+            for j in range(A.column):
+                if i == j:
+                    continue
+                x = A[i, j]
+                s += x * np.conj(x)
+        return s
+
+    N = sumOfSquareOfNonDiag(A)
+    δ = (N ** 0.5) / n
+    m = 0
+    transCounts = []
+    # ns = [N]
+    while δ > eps and m < maxIter:
+        m += 1
+        s = 0
+        # mi, mj = 0, 0
+        # for i in range(n):
+        #     for j in range(0, i):
+        #         a = A[i, j]
+        #         if np.abs(a) > maximal:
+        #             maximal = np.abs(a)
+        #             mi, mj = i, j
+        # # print(maximal,mi,mj)
+        # if maximal < eps:
+        #     break
+        # givensTrans(A, mi, mj)
+        transCount = 0
+        for i in range(n):
+            for j in range(0, i):
+                a = np.abs(A[i, j])
+                s += a ** 2
+                # maximal = max(np.abs(a),maximal)
+                if a > δ:
+                    transCount += 1
+                    givensTrans(A, i, j)
+        transCounts.append(transCount)
+        # ns.append()
+        δ /= n
+
+    return [A[i, i] for i in range(n)], (m, transCounts,)
+
+
+def eigenValuesQR(A: Matrix, eps=1E-3, maxIter=50):
+    """
+    使用 QR 方法计算实矩阵 `A` 的全体特征值，要求 `A` 的特征值全为单根。
+
+    :param A: 实对称矩阵
+    :param eps: 近似精度
+    :param maxIter: 最大迭代次数
+    :return: (A 的特征值列表, 其它数据)，其他数据=(迭代次数，每次迭代的变换次数列表，)
+    """
+    require(A.isSquare())
+    from numeracy.linear import IterativeMethod
+    H1, vs = IterativeMethod.orthSimHessExtend(A, A.row, A.getCol(0))
+    H = H1[:-1, :]
+    A = H
+    diffs = []
+    k = 0
+    while k < maxIter:
+        k += 1
+        Q, R = A.decompQR()
+        A_1 = R * Q
+
+        def diagDiff():
+            d = 0.0
+            for i in range(A.row):
+                d = np.max(d, np.abs(A[i, i] - A_1[i, i]))
+            return d
+
+        d = diagDiff()
+        diffs.append(d)
+        small = (d < eps)
+        A = A_1
+        if small:
+            break
+    return [A[i, i] for i in range(A.row)], (k, diffs)
