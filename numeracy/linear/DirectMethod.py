@@ -85,7 +85,7 @@ def solveCholesky(A: TMatrix, b: TVector) -> TVector:
     return x
 
 
-def solveRegularization(A: TMatrix, b: TVector, alpha = None) -> TVector:
+def solveRegularization(A: TMatrix, b: TVector, alpha=None) -> TVector:
     """
     Tikhonov正则化方法，利用矩阵的奇异值分解
 

@@ -482,7 +482,7 @@ def eigenValuesQR(A: Matrix, eps=1E-3, maxIter=50):
         def diagDiff():
             d = 0.0
             for i in range(A.row):
-                d = np.max(d, np.abs(A[i, i] - A_1[i, i]))
+                d = max(d, np.abs(A[i, i] - A_1[i, i]))
             return d
 
         d = diagDiff()
