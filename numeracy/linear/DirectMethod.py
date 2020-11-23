@@ -109,3 +109,46 @@ def solveRegularization(A: TMatrix, b: TVector, alpha=None) -> TVector:
         coef = D[i] * b.innerProduct(v[i]) / (alpha + D[i] ** 2)
         x += coef * u[i]
     return x
+
+
+def solveTriDiag(diag: TVector, upper: TVector, lower: TVector, b: TVector) -> TVector:
+    """
+    求解关于三对角矩阵的线性方程组。
+
+
+    :param diag:
+    :param upper:
+    :param lower:
+    :param b:
+    :return:
+    """
+    n = diag.length
+    u = np.zeros(n, diag.data.dtype)
+    l = np.zeros(n, diag.data.dtype)
+    c = upper
+
+    u[0] = diag[0]
+    for i in range(1, n):
+        l[i] = lower[i - 1] / u[i - 1]
+        u[i] = diag[i] - l[i] * c[i - 1]
+
+    y = np.zeros_like(u)
+    y[0] = b[0]
+    for i in range(1, n):
+        y[i] = b[i] - l[i] * y[i - 1]
+    # print("u = ", u)
+    # print("L = ", l)
+    # print("c = ", c)
+    # print("y = ", y)
+
+    x = np.zeros_like(y)
+    x[n - 1] = y[n - 1] / u[n - 1]
+    for i in range(n - 2, -1,-1):
+        x[i] = (y[i] - c[i] * x[i + 1]) / u[i]
+    return Vector.of(x, True)
+
+
+diag = Vector.of(2.0 * np.ones(5))
+u = Vector.of(-1.0 * np.ones(4))
+
+print(solveTriDiag(diag, u, u, Vector.of([1, 0, 0, 0, 0], dtype=np.float)))
