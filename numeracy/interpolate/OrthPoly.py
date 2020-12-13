@@ -105,6 +105,6 @@ def interLegendre(f, n=5):
 
 
 def interTchebychev(f, n=5):
-    return orthPolyInterpolate(f, -0.9999, 0.9999, weightTchebychev, genTchebychev(True), n)
+    return orthPolyInterpolate(f, -0.999, 0.999, weightTchebychev, genTchebychev(True), n)
 
 
