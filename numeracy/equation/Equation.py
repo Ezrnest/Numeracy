@@ -64,7 +64,7 @@ def fixPointIter(phi, x0, eps=1E-5, maxIter=100, bound=(None, None)):
     return x, False
 
 
-def speedUpSteffensen(phi, x0, eps=1E-5, maxIter=100):
+def speedUpSteffensen(phi, x0, eps=1E-5, maxIter=10):
     """
     使用 Steffensen 加速方法进行不动点迭代。
 
